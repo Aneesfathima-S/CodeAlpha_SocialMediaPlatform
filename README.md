@@ -1,7 +1,7 @@
-# 🌐 ConnectSphere
+## 🌐 ConnectSphere
 
 A clean and interactive **mini social media app** built using **HTML, CSS, JavaScript**, and **Express.js with MongoDB**.  
-Users can post updates, like posts, comment .
+Users can post updates, like posts, comment . 
 ---
 
 ## ✨ Features
