@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectSphere - Social Media Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .post-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comment-box {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .comment-box.show {
+            max-height: 500px;
+        }
+        
+        .like-btn {
+            transition: color 0.2s ease-in-out;
+        }
+        
+        .like-btn.liked {
+            color: #ff4d4f;
+        }
+        
+        .avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="gradient-bg text-white shadow-lg">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span class="text-xl font-bold">ConnectSphere</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <input type="text" placeholder="Search..." class="px-4 py-2 rounded-full text-gray-800 focus:outline-none">
+                    <div class="relative">
+                        <img src="https://i.pinimg.com/1200x/5e/d0/f4/5ed0f47e522d6e65b6d99862485ee150.jpg" alt="User profile" class="w-8 h-8 rounded-full cursor-pointer" alt="User profile" class="w-8 h-8 rounded-full cursor-pointer">
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Sidebar -->
+                <div class="w-full md:w-1/4 lg:w-1/5">
+                    <div class="bg-white rounded-lg shadow p-4 mb-4">
+                        <div class="flex flex-col items-center">
+                            <img src="https://i.pinimg.com/736x/d0/37/f2/d037f294c1d916d2314dd9ea477ad0a9.jpg" alt="User profile picture" class="w-20 h-20 rounded-full mb-4">
+                            <h3 class="font-bold text-lg" id="current-username">Shiny</h3>
+                            <p class="text-gray-600 text-sm" id="current-user-bio">Digital creator | Photography enthusiast</p>
+                            <div class="flex justify-between w-full mt-4 text-center">
+                                <div>
+                                    <div class="font-bold" id="follower-count">542</div>
+                                    <div class="text-gray-600 text-sm">Followers</div>
+                                </div>
+                                <div>
+                                    <div class="font-bold" id="following-count">287</div>
+                                    <div class="text-gray-600 text-sm">Following</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h3 class="font-bold mb-4">Suggested Friends</h3>
+                        <div id="suggested-friends">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Feed -->
+                <div class="w-full md:w-2/4 lg:w-3/5">
+                    <!-- Create Post -->
+                    <div class="bg-white rounded-lg shadow p-4 mb-4">
+                        <div class="flex items-center mb-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9cc3514f-3404-4cc8-8039-3d72d16f41c6.png" alt="Current user's avatar" class="w-10 h-10 rounded-full mr-3">
+                            <input type="text" id="post-content" placeholder="What's on your mind?" class="flex-grow px-4 py-2 border rounded-full focus:outline-none">
+                        </div>
+                        <div class="flex justify-between">
+                            <button class="flex items-center text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                Photo
+                            </button>
+                            <button id="post-button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-full">
+                                Post
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Posts Feed -->
+                    <div id="posts-container">
+                        <!-- Posts will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="w-full md:w-1/4 lg:w-1/5">
+                    <div class="bg-white rounded-lg shadow p-4 mb-4">
+                        <h3 class="font-bold mb-4">Trending Now</h3>
+                        <div id="trending-topics">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h3 class="font-bold mb-4">Notifications</h3>
+                        <div id="notifications">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Post Template (hidden) -->
+    <template id="post-template">
+        <div class="bg-white rounded-lg shadow post-card mb-4">
+            <div class="p-4">
+                <div class="flex items-center mb-4">
+                    <img src="" alt="User avatar" class="w-10 h-10 rounded-full mr-3 post-avatar" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/34a07dab-8392-48a5-84d6-09f5c1ba1428.png">
+                    <div>
+                        <div class="font-bold post-username">Username</div>
+                        <div class="text-gray-500 text-sm post-time">2 hours ago</div>
+                    </div>
+                </div>
+                <div class="mb-4 post-content">Post content goes here...</div>
+                <img src="" alt="Post image" class="w-full rounded mb-3 post-image hidden" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/6fd9bd66-8427-47ea-96ef-2df139155130.png">
+                <div class="flex justify-between text-gray-500 border-t border-b border-gray-100 py-2">
+                    <div class="flex items-center space-x-2">
+                        <button class="flex items-center like-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            <span class="post-likes-count">0</span>
+                        </button>
+                    </div>
+                    <button class="flex items-center toggle-comments-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        <span>Comments</span>
+                    </button>
+                </div>
+                
+                <!-- Comments Section -->
+                <div class="comment-box">
+                    <div class="mt-3">
+                        <div class="flex items-center mb-3">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c784d2a5-fba3-401b-b41c-6b325299f7a1.png" alt="Current user's avatar" class="w-8 h-8 rounded-full mr-2">
+                            <input type="text" placeholder="Write a comment..." class="flex-grow px-3 py-1 border rounded-full focus:outline-none comment-input">
+                            <button class="ml-2 text-blue-500 hover:text-blue-600 font-medium comment-btn">Post</button>
+                        </div>
+                        <div class="comments-container">
+                            <!-- Comments will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Comment Template (hidden) -->
+    <template id="comment-template">
+        <div class="flex mb-3">
+            <img src="" alt="Commenter avatar" class="w-8 h-8 rounded-full mr-3 comment-avatar" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e1d688fe-4612-4c47-a5e7-94c443d23965.png">
+            <div class="flex-grow">
+                <div class="bg-gray-100 rounded-lg p-2">
+                    <div class="font-bold text-sm comment-username">Username</div>
+                    <div class="comment-content">Comment content...</div>
+                </div>
+                <div class="text-xs text-gray-500 mt-1 comment-time">Just now</div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Script -->
+    <script>
+        // Mock database
+        const mockDatabase = {
+            currentUser: {
+                id: 1,
+                username: "Shiny",
+                avatar: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4176f079-8abb-48f0-9434-b1518799cb63.png",
+                bio: "Digital creator | Photography enthusiast",
+                followers: 542,
+                following: 287
+            },
+            suggestedFriends: [
+                { id: 2, username: "Sarah", avatar: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0cb91d2f-568b-4330-94e4-119aef5aa31a.png", mutualFriends: 12 },
+                { id: 3, username: "Chen", avatar: "https://i.pinimg.com/1200x/fb/a6/11/fba6118f7582d6c47b056936128aef99.jpg", mutualFriends: 8 },
+                { id: 4, username: "Emma Wilson", avatar: "https://i.pinimg.com/1200x/7d/cd/39/7dcd3972f9cfbb237b495faf10acdffb.jpg", mutualFriends: 5 }
+            ],
+            trendingTopics: [
+                { id: 1, topic: "#SummerVibes", postCount: "12.5K" },
+                { id: 2, topic: "#TechNews", postCount: "8.7K" },
+                { id: 3, topic: "#Photography", postCount: "5.3K" }
+            ],
+            notifications: [
+                { id: 1, text: "Michael liked your post", time: "5 min ago", avatar: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/99adeb16-78a8-4c75-afdf-e5a6f425c523.png" },
+                { id: 2, text: "Emma started following you", time: "32 min ago", avatar: "https://i.pinimg.com/1200x/7d/cd/39/7dcd3972f9cfbb237b495faf10acdffb.jpg" },
+                { id: 3, text: "Sarah commented on your photo", time: "2 hours ago", avatar: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0cb91d2f-568b-4330-94e4-119aef5aa31a.png" }
+            ],
+            posts: [
+                {
+                    id: 1,
+                    userId: 2,
+                    username: "Sarah",
+                    avatar: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0cb91d2f-568b-4330-94e4-119aef5aa31a.png",
+                    content: "Just visited this amazing cafe downtown! The aesthetic is just perfect for some Instagram shots.",
+                    image: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/91972faa-44db-4bc4-81ee-2e68727b7803.png",
+                    time: "2 hours ago",
+                    likes: 24,
+                    comments: [
+                        { id: 1, userId: 3, username: "Michael Chen", avatar: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/aac78cb9-1215-42a6-a1de-a59e0d5b3636.png", content: "Looks amazing! What's the name of the place?", time: "1 hour ago" },
+                        { id: 2, userId: 1, username: "John Doe", avatar: "https://placehold.co/32x32", content: "Love the vibe!", time: "30 min ago" }
+                    ]
+                },
+                {
+                    id: 2,
+                    userId: 3,
+                    username: "Michael Chen",
+                    avatar: "https://placehold.co/40x40",
+                    content: "Working on a new coding project. Can't wait to share it with you all! #coding #webdev",
+                    time: "4 hours ago",
+                    likes: 12,
+                    comments: [
+                        { id: 1, userId: 4, username: "Emma Wilson", avatar: "https://placehold.co/32x32", content: "Excited to see it!", time: "3 hours ago" }
+                    ]
+                }
+            ]
+        };
+
+        // DOM Elements
+        const postsContainer = document.getElementById('posts-container');
+        const suggestedFriendsList = document.getElementById('suggested-friends');
+        const trendingTopicsList = document.getElementById('trending-topics');
+        const notificationsList = document.getElementById('notifications');
+        const postButton = document.getElementById('post-button');
+        const postContentInput = document.getElementById('post-content');
+        const postTemplate = document.getElementById('post-template');
+        const commentTemplate = document.getElementById('comment-template');
+
+        // Current User Info
+        document.getElementById('current-username').textContent = mockDatabase.currentUser.username;
+        document.getElementById('current-user-bio').textContent = mockDatabase.currentUser.bio;
+        document.getElementById('follower-count').textContent = mockDatabase.currentUser.followers;
+        document.getElementById('following-count').textContent = mockDatabase.currentUser.following;
+
+        // Load Suggested Friends
+        function loadSuggestedFriends() {
+            suggestedFriendsList.innerHTML = '';
+            mockDatabase.suggestedFriends.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'flex items-center justify-between mb-3';
+                friendElement.innerHTML = `
+                    <div class="flex items-center">
+                        <img src="${friend.avatar}" alt="${friend.username}" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <div class="font-medium text-sm">${friend.username}</div>
+                            <div class="text-xs text-gray-500">${friend.mutualFriends} mutual friends</div>
+                        </div>
+                    </div>
+                    <button class="text-blue-500 text-xs font-medium follow-btn" data-id="${friend.id}">Follow</button>
+                `;
+                suggestedFriendsList.appendChild(friendElement);
+            });
+        }
+
+        // Load Trending Topics
+        function loadTrendingTopics() {
+            trendingTopicsList.innerHTML = '';
+            mockDatabase.trendingTopics.forEach(topic => {
+                const topicElement = document.createElement('div');
+                topicElement.className = 'flex justify-between items-center mb-2';
+                topicElement.innerHTML = `
+                    <span class="font-medium">${topic.topic}</span>
+                    <span class="text-gray-500 text-xs">${topic.postCount} posts</span>
+                `;
+                trendingTopicsList.appendChild(topicElement);
+            });
+        }
+
+        // Load Notifications
+        function loadNotifications() {
+            notificationsList.innerHTML = '';
+            mockDatabase.notifications.forEach(notification => {
+                const notificationElement = document.createElement('div');
+                notificationElement.className = 'flex items-center mb-3';
+                notificationElement.innerHTML = `
+                    <img src="${notification.avatar}" alt="Notification avatar" class="w-10 h-10 rounded-full mr-3">
+                    <div class="flex-grow">
+                        <div class="text-sm">${notification.text}</div>
+                        <div class="text-xs text-gray-500">${notification.time}</div>
+                    </div>
+                `;
+                notificationsList.appendChild(notificationElement);
+            });
+        }
+
+        // Load Posts
+        function loadPosts() {
+            postsContainer.innerHTML = '';
+            mockDatabase.posts.forEach(post => {
+                const postElement = postTemplate.content.cloneNode(true);
+                
+                // Set post data
+                postElement.querySelector('.post-avatar').src = post.avatar;
+                postElement.querySelector('.post-avatar').alt = post.username;
+                postElement.querySelector('.post-username').textContent = post.username;
+                postElement.querySelector('.post-time').textContent = post.time;
+                postElement.querySelector('.post-content').textContent = post.content;
+                postElement.querySelector('.post-likes-count').textContent = post.likes;
+                
+                // Handle post image
+                const postImage = postElement.querySelector('.post-image');
+                if (post.image) {
+                    postImage.src = post.image;
+                    postImage.alt = `${post.username}'s post image`;
+                    postImage.classList.remove('hidden');
+                } else {
+                    postImage.classList.add('hidden');
+                }
+                
+                // Like button functionality
+                const likeBtn = postElement.querySelector('.like-btn');
+                likeBtn.addEventListener('click', function() {
+                    const likesCount = postElement.querySelector('.post-likes-count');
+                    if (this.classList.contains('liked')) {
+                        this.classList.remove('liked');
+                        likesCount.textContent = parseInt(likesCount.textContent) - 1;
+                    } else {
+                        this.classList.add('liked');
+                        likesCount.textContent = parseInt(likesCount.textContent) + 1;
+                    }
+                });
+                
+                // Comments toggle functionality
+                const toggleCommentsBtn = postElement.querySelector('.toggle-comments-btn');
+                const commentBox = postElement.querySelector('.comment-box');
+                toggleCommentsBtn.addEventListener('click', function() {
+                    commentBox.classList.toggle('show');
+                });
+                
+                // Comments container
+                const commentsContainer = postElement.querySelector('.comments-container');
+                
+                // Load existing comments
+                if (post.comments && post.comments.length > 0) {
+                    post.comments.forEach(comment => {
+                        const commentElement = commentTemplate.content.cloneNode(true);
+                        commentElement.querySelector('.comment-avatar').src = comment.avatar;
+                        commentElement.querySelector('.comment-avatar').alt = comment.username;
+                        commentElement.querySelector('.comment-username').textContent = comment.username;
+                        commentElement.querySelector('.comment-content').textContent = comment.content;
+                        commentElement.querySelector('.comment-time').textContent = comment.time;
+                        commentsContainer.appendChild(commentElement);
+                    });
+                }
+                
+                // Add comment functionality
+                const commentInput = postElement.querySelector('.comment-input');
+                const commentBtn = postElement.querySelector('.comment-btn');
+                commentBtn.addEventListener('click', function() {
+                    if (commentInput.value.trim() === '') return;
+                    
+                    const newComment = {
+                        id: Math.floor(Math.random() * 1000),
+                        userId: mockDatabase.currentUser.id,
+                        username: mockDatabase.currentUser.username,
+                        avatar: "https://placehold.co/32x32",
+                        content: commentInput.value,
+                        time: "Just now"
+                    };
+                    
+                    const commentElement = commentTemplate.content.cloneNode(true);
+                    commentElement.querySelector('.comment-avatar').src = newComment.avatar;
+                    commentElement.querySelector('.comment-avatar').alt = newComment.username;
+                    commentElement.querySelector('.comment-username').textContent = newComment.username;
+                    commentElement.querySelector('.comment-content').textContent = newComment.content;
+                    commentElement.querySelector('.comment-time').textContent = newComment.time;
+                    commentsContainer.appendChild(commentElement);
+                    
+                    commentInput.value = '';
+                    
+                    // In a real app, we would send this to the backend
+                    post.comments.push(newComment);
+                });
+                
+                postsContainer.appendChild(postElement);
+            });
+        }
+
+        // Create new post
+        postButton.addEventListener('click', function() {
+            if (postContentInput.value.trim() === '') return;
+            
+            const newPost = {
+                id: Math.floor(Math.random() * 1000),
+                userId: mockDatabase.currentUser.id,
+                username: mockDatabase.currentUser.username,
+                avatar: "https://i.pinimg.com/736x/d0/37/f2/d037f294c1d916d2314dd9ea477ad0a9.jpg",
+                content: postContentInput.value,
+                time: "Just now",
+                likes: 0,
+                comments: []
+            };
+            
+            mockDatabase.posts.unshift(newPost);
+            postContentInput.value = '';
+            loadPosts();
+        });
+
+        // Follow button event delegation
+        suggestedFriendsList.addEventListener('click', function(e) {
+            if (e.target.classList.contains('follow-btn')) {
+                const userId = parseInt(e.target.getAttribute('data-id'));
+                // In a real app, we would send this to the backend
+                e.target.textContent = 'Followed';
+                e.target.disabled = true;
+            }
+        });
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSuggestedFriends();
+            loadTrendingTopics();
+            loadNotifications();
+            loadPosts();
+        });
+    </script>
+</body>
+</html>
+
